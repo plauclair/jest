@@ -18,7 +18,7 @@ import {JSDOM, VirtualConsole} from 'jsdom';
 
 class JSDOMEnvironment {
   dom: ?Object;
-  fakeTimers: ?FakeTimers<number>;
+  fakeTimers: ?FakeTimers;
   global: ?Global;
   errorEventListener: ?Function;
   moduleMocker: ?ModuleMocker;
@@ -65,16 +65,9 @@ class JSDOMEnvironment {
 
     this.moduleMocker = new mock.ModuleMocker(global);
 
-    const timerConfig = {
-      idToRef: (id: number) => id,
-      refToId: (ref: number) => ref,
-    };
-
     this.fakeTimers = new FakeTimers({
       config,
       global,
-      moduleMocker: this.moduleMocker,
-      timerConfig,
     });
   }
 

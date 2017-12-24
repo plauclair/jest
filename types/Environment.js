@@ -23,13 +23,14 @@ declare class $JestEnvironment {
   global: Global;
   fakeTimers: {
     clearAllTimers(): void,
-    runAllImmediates(): void,
     runAllTicks(): void,
     runAllTimers(): void,
     advanceTimersByTime(msToRun: number): void,
     runOnlyPendingTimers(): void,
     runWithRealTimers(callback: any): void,
     getTimerCount(): number,
+    setSystemTime(now?: number): void,
+    getRealSystemTime(): number,
     useFakeTimers(): void,
     useRealTimers(): void,
   };

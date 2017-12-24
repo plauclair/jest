@@ -24,7 +24,7 @@ type Timer = {|
 
 class NodeEnvironment {
   context: ?vm$Context;
-  fakeTimers: ?FakeTimers<Timer>;
+  fakeTimers: ?FakeTimers;
   global: ?Global;
   moduleMocker: ?ModuleMocker;
 
@@ -49,28 +49,9 @@ class NodeEnvironment {
     installCommonGlobals(global, config.globals);
     this.moduleMocker = new mock.ModuleMocker(global);
 
-    const timerIdToRef = (id: number) => ({
-      id,
-      ref() {
-        return this;
-      },
-      unref() {
-        return this;
-      },
-    });
-
-    const timerRefToId = (timer: Timer): ?number => (timer && timer.id) || null;
-
-    const timerConfig = {
-      idToRef: timerIdToRef,
-      refToId: timerRefToId,
-    };
-
     this.fakeTimers = new FakeTimers({
       config,
       global,
-      moduleMocker: this.moduleMocker,
-      timerConfig,
     });
   }
 

@@ -819,10 +819,6 @@ type JestObjectType = {
    */
   runAllTimers(): void,
   /**
-   * Exhausts all tasks queued by setImmediate().
-   */
-  runAllImmediates(): void,
-  /**
    * Executes only the macro task queue (i.e. all tasks queued by setTimeout()
    * or setInterval() and setImmediate()).
    */
@@ -862,6 +858,10 @@ type JestObjectType = {
    * Instructs Jest to use the real versions of the standard timer functions.
    */
   useRealTimers(): JestObjectType,
+  /**
+   * Get the remaining number of fake timers scheduled
+   */
+  getTimerCount(): number,
   /**
    * Creates a mock function similar to jest.fn but also tracks calls to
    * object[methodName].
