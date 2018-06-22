@@ -17,18 +17,18 @@ export default (root: string, verbose: boolean, buffer: ConsoleBuffer) => {
   const TITLE_INDENT = verbose ? '  ' : '    ';
   const CONSOLE_INDENT = TITLE_INDENT + '  ';
 
-  return buffer.reduce((output, {type, message, origin}) => {
+  return buffer.reduce((output, {api = 'console', type, message, origin}) => {
     origin = slash(path.relative(root, origin));
     message = message
       .split(/\n/)
       .map(line => CONSOLE_INDENT + line)
       .join('\n');
 
-    let typeMessage = 'console.' + type;
+    let typeMessage = `${api}.${type}`;
     if (type === 'warn') {
       message = chalk.yellow(message);
       typeMessage = chalk.yellow(typeMessage);
-    } else if (type === 'error') {
+    } else if (type === 'error' || api === 'process.stderr') {
       message = chalk.red(message);
       typeMessage = chalk.red(typeMessage);
     }

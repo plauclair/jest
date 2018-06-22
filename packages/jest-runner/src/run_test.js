@@ -28,6 +28,7 @@ import {getTestEnvironment} from 'jest-config';
 import * as docblock from 'jest-docblock';
 import {formatExecError} from 'jest-message-util';
 import sourcemapSupport from 'source-map-support';
+import {Transform} from 'readable-stream';
 
 type RunTestInternalResult = {
   leakDetector: ?LeakDetector,
@@ -78,7 +79,7 @@ async function runTestInternal(
   let runtime = undefined;
 
   const consoleOut = globalConfig.useStderr ? process.stderr : process.stdout;
-  const consoleFormatter = (type, message) =>
+  const consoleFormatter = (type, message, api = 'console', level = 4) =>
     getConsoleOutput(
       config.cwd,
       !!globalConfig.verbose,
@@ -87,20 +88,103 @@ async function runTestInternal(
         [],
         type,
         message,
-        4,
+        level,
         runtime && runtime.getSourceMaps(),
+        api,
       ),
     );
 
   let testConsole;
+  let testStdOut;
+  let testStdErr;
+  let buffer;
 
   if (globalConfig.silent) {
     testConsole = new NullConsole(consoleOut, process.stderr, consoleFormatter);
+    testStdOut = new Transform({
+      transform(chunk, encoding, callback) {
+        callback(null);
+      },
+    });
+    testStdErr = new Transform({
+      transform(chunk, encoding, callback) {
+        callback(null);
+      },
+    });
   } else if (globalConfig.verbose) {
     testConsole = new Console(consoleOut, process.stderr, consoleFormatter);
+    testStdOut = new Transform({
+      transform(chunk, encoding, callback) {
+        callback(null, chunk);
+      },
+    });
+    testStdErr = new Transform({
+      transform(chunk, encoding, callback) {
+        callback(null, chunk);
+      },
+    });
   } else {
-    testConsole = new BufferedConsole(() => runtime && runtime.getSourceMaps());
+    buffer = [];
+    testConsole = new BufferedConsole(
+      () => runtime && runtime.getSourceMaps(),
+      buffer,
+    );
+    testStdOut = new Transform({
+      transform(chunk, encoding, callback) {
+        callback(null, chunk);
+      },
+    });
+    testStdErr = new Transform({
+      transform(chunk, encoding, callback) {
+        callback(null, chunk);
+      },
+    });
   }
+
+  const originalStdOutWrite = testStdOut.write;
+  const originalStdErrWrite = testStdErr.write;
+
+  testStdOut.write = (chunk, ...rest) => {
+    const type = 'write';
+    const message = chunk.toString();
+    const api = 'process.stdout';
+
+    if (buffer) {
+      BufferedConsole.write(
+        buffer,
+        type,
+        message,
+        2,
+        runtime && runtime.getSourceMaps(),
+        api,
+      );
+    } else if (globalConfig.verbose) {
+      consoleOut.write(consoleFormatter(type, message, api, 3));
+    }
+
+    return originalStdOutWrite.call(testStdOut, chunk, ...rest);
+  };
+
+  testStdErr.write = (chunk, ...rest) => {
+    const type = 'write';
+    const message = chunk.toString();
+    const api = 'process.stderr';
+
+    if (buffer) {
+      BufferedConsole.write(
+        buffer,
+        type,
+        message,
+        2,
+        runtime && runtime.getSourceMaps(),
+        api,
+      );
+    } else if (globalConfig.verbose) {
+      consoleOut.write(consoleFormatter(type, message, api, 3));
+    }
+
+    return originalStdErrWrite.call(testStdErr, chunk, ...rest);
+  };
 
   const environment = new TestEnvironment(config, {console: testConsole});
   const leakDetector = config.detectLeaks
@@ -109,6 +193,18 @@ async function runTestInternal(
 
   const cacheFS = {[path]: testSource};
   setGlobal(environment.global, 'console', testConsole);
+
+  testStdOut.isTTY = environment.global.process.stdout.isTTY;
+  testStdErr.isTTY = environment.global.process.stderr.isTTY;
+
+  Object.defineProperty(environment.global.process, 'stdout', {
+    value: testStdOut,
+    writable: false,
+  });
+  Object.defineProperty(environment.global.process, 'stderr', {
+    value: testStdErr,
+    writable: false,
+  });
 
   runtime = new Runtime(config, environment, resolver, cacheFS, {
     collectCoverage: globalConfig.collectCoverage,

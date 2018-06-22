@@ -9,6 +9,7 @@
 
 import type {
   ConsoleBuffer,
+  LogApi,
   LogMessage,
   LogType,
   LogCounters,
@@ -30,11 +31,20 @@ export default class BufferedConsole extends Console {
   _groupDepth: number;
   _getSourceMaps: () => ?SourceMapRegistry;
 
-  constructor(getSourceMaps: () => ?SourceMapRegistry) {
-    const buffer = [];
+  constructor(
+    getSourceMaps: () => ?SourceMapRegistry,
+    buffer: ConsoleBuffer = [],
+  ) {
     super({
       write: message =>
-        BufferedConsole.write(buffer, 'log', message, null, getSourceMaps()),
+        BufferedConsole.write(
+          buffer,
+          'log',
+          message,
+          null,
+          getSourceMaps(),
+          'console',
+        ),
     });
     this._getSourceMaps = getSourceMaps;
     this._buffer = buffer;
@@ -49,11 +59,13 @@ export default class BufferedConsole extends Console {
     message: LogMessage,
     level: ?number,
     sourceMaps: ?SourceMapRegistry,
+    api: LogApi,
   ) {
     const callsite = getCallsite(level != null ? level : 2, sourceMaps);
     const origin = callsite.getFileName() + ':' + callsite.getLineNumber();
 
     buffer.push({
+      api,
       message,
       origin,
       type,
@@ -69,6 +81,7 @@ export default class BufferedConsole extends Console {
       '  '.repeat(this._groupDepth) + message,
       3,
       this._getSourceMaps(),
+      'console',
     );
   }
 
