@@ -4,6 +4,10 @@
 
 - `[jest-snapshot]` Introduce `toMatchInlineSnapshot` and `toThrowErrorMatchingInlineSnapshot` matchers ([#6380](https://github.com/facebook/jest/pull/6380))
 
+### Fixes
+
+- `[jest-cli]` Make reporters respect `useStderr` option and write to `stdout` by default
+
 ### Chore & Maintenance
 
 - `[website]` Switch domain to https://jestjs.io ([#6549](https://github.com/facebook/jest/pull/6549))

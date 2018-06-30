@@ -35,7 +35,7 @@ export default class DefaultReporter extends BaseReporter {
   _bufferedOutput: Set<FlushBufferedOutput>;
 
   constructor(globalConfig: GlobalConfig) {
-    super();
+    super(globalConfig);
     this._globalConfig = globalConfig;
     this._clear = '';
     this._out = process.stdout.write.bind(process.stdout);

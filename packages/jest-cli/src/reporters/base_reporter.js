@@ -8,6 +8,7 @@
  */
 
 import type {AggregatedResult, TestResult} from 'types/TestResult';
+import type {GlobalConfig} from 'types/Config';
 import type {Context} from 'types/Context';
 import type {Test} from 'types/TestRunner';
 import type {ReporterOnStartOptions} from 'types/Reporters';
@@ -16,13 +17,22 @@ import {remove as preRunMessageRemove} from '../pre_run_message';
 
 export default class BaseReporter {
   _error: ?Error;
+  _stream: stream$Writable;
+
+  constructor(globalConfig?: GlobalConfig) {
+    if (globalConfig && globalConfig.useStderr) {
+      this._stream = process.stderr;
+    } else {
+      this._stream = process.stdout;
+    }
+  }
 
   log(message: string) {
-    process.stderr.write(message + '\n');
+    this._stream.write(message + '\n');
   }
 
   onRunStart(results: AggregatedResult, options: ReporterOnStartOptions) {
-    preRunMessageRemove(process.stderr);
+    preRunMessageRemove(this._stream);
   }
 
   onTestResult(test: Test, testResult: TestResult, results: AggregatedResult) {}

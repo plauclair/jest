@@ -6,7 +6,6 @@
  *
  * @flow
  */
-/* global stream$Writable */
 
 import type {LogType, LogMessage, LogCounters, LogTimers} from 'types/Console';
 

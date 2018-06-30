@@ -53,7 +53,7 @@ export default class SummaryReporter extends BaseReporter {
   _globalConfig: GlobalConfig;
 
   constructor(globalConfig: GlobalConfig) {
-    super();
+    super(globalConfig);
     this._globalConfig = globalConfig;
     this._estimatedTime = 0;
   }
