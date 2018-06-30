@@ -6,7 +6,7 @@
 
 ### Fixes
 
-- `[jest-cli]` Make reporters respect `useStderr` option and write to `stdout` by default
+- `[jest-cli]` Make reporters respect `useStderr` option and write to `stdout` by default ([#6583](https://github.com/facebook/jest/pull/6583))
 
 ### Chore & Maintenance
 
