@@ -13,7 +13,9 @@ import type {GlobalConfig, Path, ProjectConfig} from './Config';
 import type {ReporterOnStartOptions} from 'types/Reporters';
 import type {
   AggregatedResult,
+  AssertionResult,
   SerializableError,
+  TestCase,
   TestResult,
 } from 'types/TestResult';
 import type Runtime from 'jest-runtime';
@@ -32,16 +34,28 @@ export type OnTestFailure = (Test, SerializableError) => Promise<*>;
 export type OnTestSuccess = (Test, TestResult) => Promise<*>;
 
 export type Reporter = {
-  +onTestResult: (
+  +onTestResult?: (
     test: Test,
     testResult: TestResult,
     aggregatedResult: AggregatedResult,
+  ) => ?Promise<void>,
+  +onTestFileResult?: (
+    test: Test,
+    testResult: TestResult,
+    aggregatedResult: AggregatedResult,
+  ) => ?Promise<void>,
+  +onTestCaseResult?: (
+    test: Test,
+    testCase: TestCase,
+    testCaseResult: AssertionResult,
   ) => ?Promise<void>,
   +onRunStart: (
     results: AggregatedResult,
     options: ReporterOnStartOptions,
   ) => ?Promise<void>,
-  +onTestStart: (test: Test) => ?Promise<void>,
+  +onTestStart?: (test: Test) => ?Promise<void>,
+  +onTestCaseStart?: (test: Test, testCase: TestCase) => ?Promise<void>,
+  +onTestFileStart?: (test: Test) => ?Promise<void>,
   +onRunComplete: (
     contexts: Set<Context>,
     results: AggregatedResult,

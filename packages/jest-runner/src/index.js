@@ -8,14 +8,7 @@
  */
 
 import type {GlobalConfig} from 'types/Config';
-import type {
-  OnTestFailure,
-  OnTestStart,
-  OnTestSuccess,
-  Test,
-  TestRunnerOptions,
-  TestWatcher,
-} from 'types/TestRunner';
+import type {Test, TestRunnerOptions, TestWatcher} from 'types/TestRunner';
 
 import typeof {worker} from './test_worker';
 
@@ -23,6 +16,7 @@ import exit from 'exit';
 import runTest from './run_test';
 import throat from 'throat';
 import Worker from 'jest-worker';
+import Emittery from 'emittery/legacy';
 
 const TEST_WORKER_PATH = require.resolve('./test_worker');
 
@@ -30,37 +24,24 @@ type WorkerInterface = Worker & {worker: worker};
 
 class TestRunner {
   _globalConfig: GlobalConfig;
+  eventEmitter: Emittery;
 
   constructor(globalConfig: GlobalConfig) {
     this._globalConfig = globalConfig;
+    this.eventEmitter = new Emittery();
   }
 
   async runTests(
     tests: Array<Test>,
     watcher: TestWatcher,
-    onStart: OnTestStart,
-    onResult: OnTestSuccess,
-    onFailure: OnTestFailure,
     options: TestRunnerOptions,
   ): Promise<void> {
     return await (options.serial
-      ? this._createInBandTestRun(tests, watcher, onStart, onResult, onFailure)
-      : this._createParallelTestRun(
-          tests,
-          watcher,
-          onStart,
-          onResult,
-          onFailure,
-        ));
+      ? this._createInBandTestRun(tests, watcher)
+      : this._createParallelTestRun(tests, watcher));
   }
 
-  async _createInBandTestRun(
-    tests: Array<Test>,
-    watcher: TestWatcher,
-    onStart: OnTestStart,
-    onResult: OnTestSuccess,
-    onFailure: OnTestFailure,
-  ) {
+  async _createInBandTestRun(tests: Array<Test>, watcher: TestWatcher) {
     process.env.JEST_WORKER_ID = '1';
     const mutex = throat(1);
     return tests.reduce(
@@ -72,7 +53,7 @@ class TestRunner {
                 throw new CancelRun();
               }
 
-              await onStart(test);
+              await this.eventEmitter.emit('test-file-start', test);
               return runTest(
                 test.path,
                 this._globalConfig,
@@ -80,20 +61,18 @@ class TestRunner {
                 test.context.resolver,
               );
             })
-            .then(result => onResult(test, result))
-            .catch(err => onFailure(test, err)),
+            .then(result =>
+              this.eventEmitter.emit('test-file-success', test, result),
+            )
+            .catch(err =>
+              this.eventEmitter.emit('test-file-failure', test, err),
+            ),
         ),
       Promise.resolve(),
     );
   }
 
-  async _createParallelTestRun(
-    tests: Array<Test>,
-    watcher: TestWatcher,
-    onStart: OnTestStart,
-    onResult: OnTestSuccess,
-    onFailure: OnTestFailure,
-  ) {
+  async _createParallelTestRun(tests: Array<Test>, watcher: TestWatcher) {
     // $FlowFixMe: class object is augmented with worker when instantiating.
     const worker: WorkerInterface = new Worker(TEST_WORKER_PATH, {
       exposedMethods: ['worker'],
@@ -112,7 +91,7 @@ class TestRunner {
           return Promise.reject();
         }
 
-        await onStart(test);
+        await this.eventEmitter.emit('test-file-start', test);
 
         return worker.worker({
           config: test.context.config,
@@ -125,7 +104,7 @@ class TestRunner {
       });
 
     const onError = async (err, test) => {
-      await onFailure(test, err);
+      await this.eventEmitter.emit('test-file-failure', test, err);
       if (err.type === 'ProcessTerminatedError') {
         console.error(
           'A worker process has quit unexpectedly! ' +
@@ -146,7 +125,9 @@ class TestRunner {
     const runAllTests = Promise.all(
       tests.map(test =>
         runTestInWorker(test)
-          .then(testResult => onResult(test, testResult))
+          .then(result =>
+            this.eventEmitter.emit('test-file-success', test, result),
+          )
           .catch(error => onError(error, test)),
       ),
     );

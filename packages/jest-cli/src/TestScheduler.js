@@ -70,7 +70,9 @@ export default class TestScheduler {
   }
 
   async scheduleTests(tests: Array<Test>, watcher: TestWatcher) {
-    const onStart = this._dispatcher.onTestStart.bind(this._dispatcher);
+    const onTestFileStart = this._dispatcher.onTestFileStart.bind(
+      this._dispatcher,
+    );
     const timings = [];
     const contexts = new Set();
     tests.forEach(test => {
@@ -137,7 +139,11 @@ export default class TestScheduler {
       }
 
       addResult(aggregatedResults, testResult);
-      await this._dispatcher.onTestResult(test, testResult, aggregatedResults);
+      await this._dispatcher.onTestFileResult(
+        test,
+        testResult,
+        aggregatedResults,
+      );
       return this._bailIfNeeded(contexts, aggregatedResults, watcher);
     };
 
@@ -153,7 +159,11 @@ export default class TestScheduler {
         test.path,
       );
       addResult(aggregatedResults, testResult);
-      await this._dispatcher.onTestResult(test, testResult, aggregatedResults);
+      await this._dispatcher.onTestFileResult(
+        test,
+        testResult,
+        aggregatedResults,
+      );
     };
 
     const updateSnapshotState = () => {
@@ -196,16 +206,24 @@ export default class TestScheduler {
     if (testsByRunner) {
       try {
         for (const runner of Object.keys(testRunners)) {
-          await testRunners[runner].runTests(
-            testsByRunner[runner],
-            watcher,
-            onStart,
-            onResult,
-            onFailure,
-            {
-              serial: runInBand || Boolean(testRunners[runner].isSerial),
-            },
-          );
+          const testRunner = testRunners[runner];
+          const tests = testsByRunner[runner];
+          const testRunnerOptions = {
+            serial: runInBand || Boolean(testRunner.isSerial),
+          };
+
+          const unsubscribes = [
+            testRunner.eventEmitter.on('test-file-start', onTestFileStart),
+            testRunner.eventEmitter.on('test-file-success', onResult),
+            testRunner.eventEmitter.on('test-file-failure', onFailure),
+            testRunner.eventEmitter.on('test-file-result', () => {
+              // TODO
+            }),
+          ];
+
+          await testRunner.runTests(tests, watcher, testRunnerOptions);
+
+          unsubscribes.forEach(sub => sub());
         }
       } catch (error) {
         if (!watcher.isInterrupted()) {

@@ -8,6 +8,7 @@
   "license": "MIT",
   "main": "build/index.js",
   "dependencies": {
+    "emittery": "^0.4.1",
     "exit": "^0.1.2",
     "graceful-fs": "^4.1.11",
     "jest-config": "^23.6.0",

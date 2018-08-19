@@ -93,6 +93,14 @@ type Callsite = {|
   line: number,
 |};
 
+export type TestCase = {|
+  ancestorTitles: Array<string>,
+  fullName: string,
+  location: ?Callsite,
+  title: string,
+|};
+
+// Why can't we do TestCase & ...?
 export type AssertionResult = {|
   ancestorTitles: Array<string>,
   duration?: ?Milliseconds,
