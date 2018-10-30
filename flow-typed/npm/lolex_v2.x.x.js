@@ -40,7 +40,6 @@ declare module 'lolex' {
     runMicrotasks(): void;
     runToFrame(): void;
     runToLast(): void;
-    setSystemTime(now?: number | Date): void;
     uninstall(): Object[];
     Date: typeof Date;
     Performance: typeof Performance;

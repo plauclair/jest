@@ -29,8 +29,6 @@ declare class $JestEnvironment {
     runOnlyPendingTimers(): void,
     runWithRealTimers(callback: any): void,
     getTimerCount(): number,
-    setSystemTime(now?: number): void,
-    getRealSystemTime(): number,
     useFakeTimers(): void,
     useRealTimers(): void,
   };

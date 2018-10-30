@@ -36,8 +36,6 @@ export type Jest = {|
   runAllTicks(): void,
   runAllTimers(): void,
   runOnlyPendingTimers(): void,
-  getRealSystemTime(): number,
-  setSystemTime(now?: number): void,
   advanceTimersByTime(msToRun: number): void,
   runTimersToTime(msToRun: number): void,
   getTimerCount(): number,
