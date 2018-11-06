@@ -13,6 +13,8 @@ import type {AggregatedResult} from 'types/TestResult';
 import path from 'path';
 import chalk from 'chalk';
 import slash from 'slash';
+import React, {PureComponent, Fragment} from 'react';
+import {Box, Color, Text} from 'ink';
 
 type SummaryOptions = {|
   estimatedTime?: number,
@@ -34,20 +36,31 @@ export const printDisplayName = (config: ProjectConfig) => {
   return '';
 };
 
-export const trimAndFormatPath = (
+export const FormattedPath = ({
+  pad,
+  config,
+  testPath,
+  columns,
+}: {
   pad: number,
   config: ProjectConfig | GlobalConfig,
   testPath: Path,
   columns: number,
-): string => {
+}) => {
   const maxLength = columns - pad;
   const relative = relativePath(config, testPath);
   const {basename} = relative;
   let {dirname} = relative;
+  dirname = slash(dirname);
 
   // length is ok
-  if ((dirname + path.sep + basename).length <= maxLength) {
-    return slash(chalk.dim(dirname + path.sep) + chalk.bold(basename));
+  if ((dirname + '/' + basename).length <= maxLength) {
+    return (
+      <Fragment>
+        <Color dim>{dirname}/</Color>
+        <Color bold>{basename}</Color>
+      </Fragment>
+    );
   }
 
   // we can fit trimmed dirname and full basename
@@ -55,19 +68,29 @@ export const trimAndFormatPath = (
   if (basenameLength + 4 < maxLength) {
     const dirnameLength = maxLength - 4 - basenameLength;
     dirname =
-      '...' + dirname.slice(dirname.length - dirnameLength, dirname.length);
-    return slash(chalk.dim(dirname + path.sep) + chalk.bold(basename));
+      '…' + dirname.slice(dirname.length - dirnameLength, dirname.length);
+    return (
+      <Fragment>
+        <Color dim>{dirname}/</Color>
+        <Color bold>{basename}</Color>
+      </Fragment>
+    );
   }
 
   if (basenameLength + 4 === maxLength) {
-    return slash(chalk.dim('...' + path.sep) + chalk.bold(basename));
+    return (
+      <Fragment>
+        <Color dim>…/</Color>
+        <Color bold>{basename}</Color>
+      </Fragment>
+    );
   }
 
   // can't fit dirname, but can fit trimmed basename
-  return slash(
-    chalk.bold(
-      '...' + basename.slice(basename.length - maxLength - 4, basename.length),
-    ),
+  return (
+    <Color bold>
+      …{basename.slice(basename.length - maxLength - 4, basename.length)}
+    </Color>
   );
 };
 
@@ -95,103 +118,227 @@ export const relativePath = (
 export const pluralize = (word: string, count: number) =>
   `${count} ${word}${count === 1 ? '' : 's'}`;
 
-export const getSummary = (
+type SummaryProps = {
   aggregatedResults: AggregatedResult,
   options?: SummaryOptions,
-) => {
-  let runTime = (Date.now() - aggregatedResults.startTime) / 1000;
-  if (options && options.roundTime) {
-    runTime = Math.floor(runTime);
-  }
-
-  const estimatedTime = (options && options.estimatedTime) || 0;
-  const snapshotResults = aggregatedResults.snapshot;
-  const snapshotsAdded = snapshotResults.added;
-  const snapshotsFailed = snapshotResults.unmatched;
-  const snapshotsOutdated = snapshotResults.unchecked;
-  const snapshotsFilesRemoved = snapshotResults.filesRemoved;
-  const snapshotsDidUpdate = snapshotResults.didUpdate;
-  const snapshotsPassed = snapshotResults.matched;
-  const snapshotsTotal = snapshotResults.total;
-  const snapshotsUpdated = snapshotResults.updated;
-  const suitesFailed = aggregatedResults.numFailedTestSuites;
-  const suitesPassed = aggregatedResults.numPassedTestSuites;
-  const suitesPending = aggregatedResults.numPendingTestSuites;
-  const suitesRun = suitesFailed + suitesPassed;
-  const suitesTotal = aggregatedResults.numTotalTestSuites;
-  const testsFailed = aggregatedResults.numFailedTests;
-  const testsPassed = aggregatedResults.numPassedTests;
-  const testsPending = aggregatedResults.numPendingTests;
-  const testsTodo = aggregatedResults.numTodoTests;
-  const testsTotal = aggregatedResults.numTotalTests;
-  const width = (options && options.width) || 0;
-
-  const suites =
-    chalk.bold('Test Suites: ') +
-    (suitesFailed ? chalk.bold.red(`${suitesFailed} failed`) + ', ' : '') +
-    (suitesPending
-      ? chalk.bold.yellow(`${suitesPending} skipped`) + ', '
-      : '') +
-    (suitesPassed ? chalk.bold.green(`${suitesPassed} passed`) + ', ' : '') +
-    (suitesRun !== suitesTotal
-      ? suitesRun + ' of ' + suitesTotal
-      : suitesTotal) +
-    ` total`;
-
-  const tests =
-    chalk.bold('Tests:       ') +
-    (testsFailed ? chalk.bold.red(`${testsFailed} failed`) + ', ' : '') +
-    (testsPending ? chalk.bold.yellow(`${testsPending} skipped`) + ', ' : '') +
-    (testsTodo ? chalk.bold.magenta(`${testsTodo} todo`) + ', ' : '') +
-    (testsPassed ? chalk.bold.green(`${testsPassed} passed`) + ', ' : '') +
-    `${testsTotal} total`;
-
-  const snapshots =
-    chalk.bold('Snapshots:   ') +
-    (snapshotsFailed
-      ? chalk.bold.red(`${snapshotsFailed} failed`) + ', '
-      : '') +
-    (snapshotsOutdated && !snapshotsDidUpdate
-      ? chalk.bold.yellow(`${snapshotsOutdated} obsolete`) + ', '
-      : '') +
-    (snapshotsOutdated && snapshotsDidUpdate
-      ? chalk.bold.green(`${snapshotsOutdated} removed`) + ', '
-      : '') +
-    (snapshotsFilesRemoved && !snapshotsDidUpdate
-      ? chalk.bold.yellow(
-          pluralize('file', snapshotsFilesRemoved) + ' obsolete',
-        ) + ', '
-      : '') +
-    (snapshotsFilesRemoved && snapshotsDidUpdate
-      ? chalk.bold.green(
-          pluralize('file', snapshotsFilesRemoved) + ' removed',
-        ) + ', '
-      : '') +
-    (snapshotsUpdated
-      ? chalk.bold.green(`${snapshotsUpdated} updated`) + ', '
-      : '') +
-    (snapshotsAdded
-      ? chalk.bold.green(`${snapshotsAdded} written`) + ', '
-      : '') +
-    (snapshotsPassed
-      ? chalk.bold.green(`${snapshotsPassed} passed`) + ', '
-      : '') +
-    `${snapshotsTotal} total`;
-
-  const time = renderTime(runTime, estimatedTime, width);
-  return [suites, tests, snapshots, time].join('\n');
 };
 
-const renderTime = (runTime, estimatedTime, width) => {
+export class Summary extends PureComponent<SummaryProps, {runTime: number}> {
+  interval: IntervalID;
+  constructor(props: SummaryProps) {
+    super(props);
+
+    this.state = {runTime: this.getRuntime(props)};
+  }
+
+  getRuntime(props: SummaryProps) {
+    const {aggregatedResults, options} = props;
+
+    let runTime = (Date.now() - aggregatedResults.startTime) / 1000;
+
+    if (options && options.roundTime) {
+      runTime = Math.floor(runTime);
+    }
+
+    return runTime;
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(() => {
+      const runTime = this.getRuntime(this.props);
+
+      this.setState({runTime});
+      // $FlowFixMe: `unref` exists in Node
+    }, 1000).unref();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  render() {
+    const {aggregatedResults, options} = this.props;
+    const {runTime} = this.state;
+
+    const estimatedTime = (options && options.estimatedTime) || 0;
+    const snapshotResults = aggregatedResults.snapshot;
+    const snapshotsAdded = snapshotResults.added;
+    const snapshotsFailed = snapshotResults.unmatched;
+    const snapshotsOutdated = snapshotResults.unchecked;
+    const snapshotsFilesRemoved = snapshotResults.filesRemoved;
+    const snapshotsDidUpdate = snapshotResults.didUpdate;
+    const snapshotsPassed = snapshotResults.matched;
+    const snapshotsTotal = snapshotResults.total;
+    const snapshotsUpdated = snapshotResults.updated;
+    const suitesFailed = aggregatedResults.numFailedTestSuites;
+    const suitesPassed = aggregatedResults.numPassedTestSuites;
+    const suitesPending = aggregatedResults.numPendingTestSuites;
+    const suitesRun = suitesFailed + suitesPassed;
+    const suitesTotal = aggregatedResults.numTotalTestSuites;
+    const testsFailed = aggregatedResults.numFailedTests;
+    const testsPassed = aggregatedResults.numPassedTests;
+    const testsPending = aggregatedResults.numPendingTests;
+    const testsTodo = aggregatedResults.numTodoTests;
+    const testsTotal = aggregatedResults.numTotalTests;
+    const width = (options && options.width) || 0;
+
+    return (
+      <Box flexDirection="column">
+        <Box>
+          <Text bold>Test Suites: </Text>
+          {suitesFailed > 0 && (
+            <Fragment>
+              <Color bold red>
+                {suitesFailed} failed
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {suitesPending > 0 && (
+            <Fragment>
+              <Color bold yellow>
+                {suitesPending} skipped
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {suitesPassed > 0 && (
+            <Fragment>
+              <Color bold green>
+                {suitesPassed} passed
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {suitesRun !== suitesTotal && suitesRun + ' of '}
+          {suitesTotal} total
+        </Box>
+        <Box>
+          <Text bold>Tests: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</Text>
+          {testsFailed > 0 && (
+            <Fragment>
+              <Color bold red>
+                {testsFailed} failed
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {testsPending > 0 && (
+            <Fragment>
+              <Color bold yellow>
+                {testsPending} skipped
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {testsTodo > 0 && (
+            <Fragment>
+              <Color bold magenta>
+                {testsTodo} todo
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {testsPassed > 0 && (
+            <Fragment>
+              <Color bold green>
+                {testsPassed} passed
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {testsTotal} total
+        </Box>
+        <Box>
+          <Text bold>Snapshots: &nbsp;&nbsp;</Text>
+          {snapshotsFailed > 0 && (
+            <Fragment>
+              <Color bold red>
+                {snapshotsFailed} failed
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {snapshotsOutdated > 0 &&
+            !snapshotsDidUpdate && (
+              <Fragment>
+                <Color bold yellow>
+                  {snapshotsOutdated} obsolete
+                </Color>
+                ,{' '}
+              </Fragment>
+            )}
+          {snapshotsOutdated > 0 &&
+            snapshotsDidUpdate && (
+              <Fragment>
+                <Color bold green>
+                  {snapshotsOutdated} removed
+                </Color>
+                ,{' '}
+              </Fragment>
+            )}
+          {snapshotsFilesRemoved > 0 &&
+            !snapshotsDidUpdate && (
+              <Fragment>
+                <Color bold yellow>
+                  {pluralize('file', snapshotsFilesRemoved)} obsolete
+                </Color>
+                ,{' '}
+              </Fragment>
+            )}
+          {snapshotsFilesRemoved > 0 &&
+            snapshotsDidUpdate && (
+              <Fragment>
+                <Color bold green>
+                  {pluralize('file', snapshotsFilesRemoved)} removed
+                </Color>
+                ,{' '}
+              </Fragment>
+            )}
+          {snapshotsUpdated > 0 && (
+            <Fragment>
+              <Color bold green>
+                {snapshotsUpdated} updated
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {snapshotsAdded > 0 && (
+            <Fragment>
+              <Color bold green>
+                {snapshotsAdded} written
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {snapshotsPassed > 0 && (
+            <Fragment>
+              <Color bold green>
+                {snapshotsPassed} passed
+              </Color>
+              ,{' '}
+            </Fragment>
+          )}
+          {snapshotsTotal} total
+        </Box>
+        <Time runTime={runTime} estimatedTime={estimatedTime} width={width} />
+      </Box>
+    );
+  }
+}
+
+const Time = ({runTime, estimatedTime, width}) => {
   // If we are more than one second over the estimated time, highlight it.
   const renderedTime =
-    estimatedTime && runTime >= estimatedTime + 1
-      ? chalk.bold.yellow(runTime + 's')
-      : runTime + 's';
-  let time = chalk.bold(`Time:`) + `        ${renderedTime}`;
-  if (runTime < estimatedTime) {
-    time += `, estimated ${estimatedTime}s`;
-  }
+    estimatedTime && runTime >= estimatedTime + 1 ? (
+      <Color bold yellow>
+        {runTime}s
+      </Color>
+    ) : (
+      <Text>{runTime}s</Text>
+    );
+
+  let progressBar;
 
   // Only show a progress bar if the test run is actually going to take
   // some time.
@@ -202,13 +349,28 @@ const renderTime = (runTime, estimatedTime, width) => {
       availableWidth,
     );
     if (availableWidth >= 2) {
-      time +=
-        '\n' +
-        chalk.green('█').repeat(length) +
-        chalk.white('█').repeat(availableWidth - length);
+      progressBar = (
+        <Box>
+          <Color green>{'█'.repeat(length)}</Color>
+          <Color white>{'█'.repeat(availableWidth - length)}</Color>
+        </Box>
+      );
     }
   }
-  return time;
+
+  return (
+    <Box flexDirection="column">
+      <Box>
+        <Text bold>Time:</Text>
+        {'\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0'}
+        {renderedTime}
+        {runTime < estimatedTime && (
+          <Fragment>, estimated {estimatedTime}s</Fragment>
+        )}
+      </Box>
+      {progressBar}
+    </Box>
+  );
 };
 
 // word-wrap a string that contains ANSI escape sequences.

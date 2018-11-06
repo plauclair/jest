@@ -9,70 +9,85 @@
 
 import type {TestResult} from 'types/TestResult';
 
-const chalk = require('chalk');
+import React, {Fragment} from 'react';
+import {Box, Color} from 'ink';
 
 const {pluralize} = require('./utils');
 
-const ARROW = ' \u203A ';
-const DOT = ' \u2022 ';
-const FAIL_COLOR = chalk.bold.red;
-const SNAPSHOT_ADDED = chalk.bold.green;
-const SNAPSHOT_UPDATED = chalk.bold.green;
-const SNAPSHOT_OUTDATED = chalk.bold.yellow;
+const Arrow = () => ' \u203A ';
+const Dot = () => ' \u2022 ';
 
-export default (
+const FailColor = ({children}) => (
+  <Color bold red>
+    {children}
+  </Color>
+);
+const SnapshotAdded = ({children}) => (
+  <Color bold green>
+    {children}
+  </Color>
+);
+const SnapshotUpdated = ({children}) => (
+  <Color bold green>
+    {children}
+  </Color>
+);
+const SnapshotOutdated = ({children}) => (
+  <Color bold yellow>
+    {children}
+  </Color>
+);
+
+const SnapshotStatus = ({
+  snapshot,
+  afterUpdate,
+}: {
   snapshot: $PropertyType<TestResult, 'snapshot'>,
   afterUpdate: boolean,
-): Array<string> => {
-  const statuses = [];
-
-  if (snapshot.added) {
-    statuses.push(
-      SNAPSHOT_ADDED(
-        ARROW + pluralize('snapshot', snapshot.added) + ' written.',
-      ),
-    );
-  }
-
-  if (snapshot.updated) {
-    statuses.push(
-      SNAPSHOT_UPDATED(
-        ARROW + pluralize('snapshot', snapshot.updated) + ' updated.',
-      ),
-    );
-  }
-
-  if (snapshot.unmatched) {
-    statuses.push(
-      FAIL_COLOR(
-        ARROW + pluralize('snapshot', snapshot.unmatched) + ' failed.',
-      ),
-    );
-  }
-
-  if (snapshot.unchecked) {
-    if (afterUpdate) {
-      statuses.push(
-        SNAPSHOT_UPDATED(
-          ARROW + pluralize('snapshot', snapshot.unchecked) + ' removed.',
-        ),
-      );
-    } else {
-      statuses.push(
-        SNAPSHOT_OUTDATED(
-          ARROW + pluralize('snapshot', snapshot.unchecked) + ' obsolete',
-        ) + '.',
-      );
-    }
-
-    snapshot.uncheckedKeys.forEach(key => {
-      statuses.push(`  ${DOT}${key}`);
-    });
-  }
-
-  if (snapshot.fileDeleted) {
-    statuses.push(SNAPSHOT_UPDATED(ARROW + 'snapshot file removed.'));
-  }
-
-  return statuses;
+}) => {
+  return (
+    <Fragment>
+      {snapshot.added > 0 && (
+        <SnapshotAdded>
+          <Arrow /> {pluralize('snapshot', snapshot.added)} written.
+        </SnapshotAdded>
+      )}
+      {snapshot.updated > 0 && (
+        <SnapshotUpdated>
+          <Arrow /> {pluralize('snapshot', snapshot.updated)} updated.
+        </SnapshotUpdated>
+      )}
+      {snapshot.unmatched > 0 && (
+        <FailColor>
+          <Arrow /> {pluralize('snapshot', snapshot.unmatched)} failed.
+        </FailColor>
+      )}
+      {snapshot.unchecked > 0 ? (
+        afterUpdate ? (
+          <SnapshotUpdated>
+            <Arrow /> {pluralize('snapshot', snapshot.unchecked)} removed.
+          </SnapshotUpdated>
+        ) : (
+          <SnapshotOutdated>
+            <Arrow /> {pluralize('snapshot', snapshot.unchecked)} obsolete.
+          </SnapshotOutdated>
+        )
+      ) : null}
+      {snapshot.unchecked > 0 &&
+        snapshot.uncheckedKeys.map(key => (
+          <Box key={key}>
+            &nbsp;&nbsp;
+            <Dot />
+            {key}
+          </Box>
+        ))}
+      {snapshot.fileDeleted && (
+        <SnapshotUpdated>
+          <Arrow /> snapshot file removed.
+        </SnapshotUpdated>
+      )}
+    </Fragment>
+  );
 };
+
+export default SnapshotStatus;

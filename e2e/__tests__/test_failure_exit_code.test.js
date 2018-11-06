@@ -28,7 +28,7 @@ test('exits with a specified code when test fail', () => {
   });
 
   let {status} = runJest(DIR);
-  expect(status).toBe(99);
+  expect(status).toBe(98);
 
   ({status} = runJest(DIR, ['--testFailureExitCode', '77']));
   expect(status).toBe(77);

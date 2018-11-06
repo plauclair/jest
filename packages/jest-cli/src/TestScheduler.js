@@ -21,6 +21,7 @@ import {
 } from './testResultHelpers';
 import CoverageReporter from './reporters/coverage_reporter';
 import DefaultReporter from './reporters/default_reporter';
+import ReactReporter from './reporters/react_reporter';
 import exit from 'exit';
 import NotifyReporter from './reporters/notify_reporter';
 import ReporterDispatcher from './ReporterDispatcher';
@@ -295,17 +296,11 @@ export default class TestScheduler {
   }
 
   _setupDefaultReporters(collectCoverage: boolean) {
-    this.addReporter(
-      this._globalConfig.verbose
-        ? new VerboseReporter(this._globalConfig)
-        : new DefaultReporter(this._globalConfig),
-    );
+    this.addReporter(new ReactReporter(this._globalConfig));
 
     if (collectCoverage) {
       this.addReporter(new CoverageReporter(this._globalConfig));
     }
-
-    this.addReporter(new SummaryReporter(this._globalConfig));
   }
 
   _addCustomReporters(reporters: Array<string | ReporterConfig>) {
