@@ -185,7 +185,9 @@ export class Summary extends PureComponent<SummaryProps, {runTime: number}> {
     return (
       <Box flexDirection="column">
         <Box>
-          <Text bold>Test Suites: </Text>
+          <Box width={13}>
+            <Text bold>Test Suites:</Text>
+          </Box>
           {suitesFailed > 0 && (
             <Fragment>
               <Color bold red>
@@ -214,7 +216,9 @@ export class Summary extends PureComponent<SummaryProps, {runTime: number}> {
           {suitesTotal} total
         </Box>
         <Box>
-          <Text bold>Tests: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</Text>
+          <Box width={13}>
+            <Text bold>Tests:</Text>
+          </Box>
           {testsFailed > 0 && (
             <Fragment>
               <Color bold red>
@@ -250,7 +254,9 @@ export class Summary extends PureComponent<SummaryProps, {runTime: number}> {
           {testsTotal} total
         </Box>
         <Box>
-          <Text bold>Snapshots: &nbsp;&nbsp;</Text>
+          <Box width={13}>
+            <Text bold>Snapshots:</Text>
+          </Box>
           {snapshotsFailed > 0 && (
             <Fragment>
               <Color bold red>
@@ -361,8 +367,9 @@ const Time = ({runTime, estimatedTime, width}) => {
   return (
     <Box flexDirection="column">
       <Box>
-        <Text bold>Time:</Text>
-        {'\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0'}
+        <Box width={13}>
+          <Text bold>Time:</Text>
+        </Box>
         {renderedTime}
         {runTime < estimatedTime && (
           <Fragment>, estimated {estimatedTime}s</Fragment>
