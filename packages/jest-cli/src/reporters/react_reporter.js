@@ -283,6 +283,7 @@ export default class DefaultReporter extends BaseReporter {
     aggregatedResults: AggregatedResult,
     options: ReporterOnStartOptions,
   ) {
+    super.onRunStart(aggregatedResults, options);
     this._unmount = render(
       <Reporter
         register={cb => this._components.push(cb)}

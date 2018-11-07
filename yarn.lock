@@ -7219,10 +7219,10 @@ init-package-json@^1.10.3:
     validate-npm-package-license "^3.0.1"
     validate-npm-package-name "^3.0.0"
 
-ink@^2.0.0-3:
-  version "2.0.0-3"
-  resolved "https://registry.yarnpkg.com/ink/-/ink-2.0.0-3.tgz#4136b0bc2e65001f1bd6d750d98821d2c69e3f85"
-  integrity sha512-gC0elLXy/ehvzJCXxeRRMGWKxcBsI6YdQkWjSF9HU23GN6tTDgurDb8jJ20yequi+5kSyIIXa2PFpewGELQ09w==
+ink@^2.0.0-4:
+  version "2.0.0-4"
+  resolved "https://registry.yarnpkg.com/ink/-/ink-2.0.0-4.tgz#a843d227420c7a835eb1974318f16f344569d665"
+  integrity sha512-p3mygxCow2SiKozrL0GSI7awkv+wLj1C3CXL2As6w80gsJZx2MboTNLkC2v1a1j+N9giN0DGkSMXSKr7pS/dLg==
   dependencies:
     arrify "^1.0.1"
     chalk "^2.4.1"
