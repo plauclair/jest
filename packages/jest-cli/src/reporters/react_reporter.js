@@ -14,7 +14,7 @@ import type {ReporterOnStartOptions} from 'types/Reporters';
 import type {ConsoleBuffer, LogType} from 'types/Console';
 
 import React, {Fragment, PureComponent} from 'react';
-import {render, Color, Box} from 'ink';
+import {render, Color, Box, Static} from 'ink';
 import BaseReporter from './base_reporter';
 import {FormattedPath, Summary} from './utils';
 import SnapshotStatus from './get_snapshot_status';
@@ -134,31 +134,33 @@ const CompletedTests = ({
 
   return (
     <Box paddingBottom={1} flexDirection="column">
-      {completedTests.map(({testResult, config}) => (
-        <Fragment key={testResult.testFilePath}>
-          <Box>
-            <TestStatus testResult={testResult} />{' '}
-            <DisplayName displayName={(config || globalConfig).displayName} />
-            <FormattedPath
-              pad={8}
-              columns={width}
-              config={config || globalConfig}
-              testPath={testResult.testFilePath}
+      <Static>
+        {completedTests.map(({testResult, config}) => (
+          <Fragment key={testResult.testFilePath}>
+            <Box>
+              <TestStatus testResult={testResult} />{' '}
+              <DisplayName displayName={(config || globalConfig).displayName} />
+              <FormattedPath
+                pad={8}
+                columns={width}
+                config={config || globalConfig}
+                testPath={testResult.testFilePath}
+              />
+            </Box>
+            <TestConsoleOutput
+              console={testResult.console}
+              verbose={globalConfig.verbose}
+              cwd={config.cwd}
             />
-          </Box>
-          <TestConsoleOutput
-            console={testResult.console}
-            verbose={globalConfig.verbose}
-            cwd={config.cwd}
-          />
-          {testResult.failureMessage &&
-            testResult.failureMessage.replace(/ /g, '\xa0')}
-          <SnapshotStatus
-            snapshot={testResult.snapshot}
-            afterUpdate={didUpdate}
-          />
-        </Fragment>
-      ))}
+            {testResult.failureMessage &&
+              testResult.failureMessage.replace(/ /g, '\xa0')}
+            <SnapshotStatus
+              snapshot={testResult.snapshot}
+              afterUpdate={didUpdate}
+            />
+          </Fragment>
+        ))}
+      </Static>
     </Box>
   );
 };
