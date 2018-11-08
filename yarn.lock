@@ -4459,13 +4459,6 @@ dateformat@^3.0.0:
   resolved "https://registry.yarnpkg.com/dateformat/-/dateformat-3.0.3.tgz#a6e37499a4d9a9cf85ef5872044d62901c9889ae"
   integrity sha512-jyCETtSl3VMZMWeRo7iY1FL19ges1t55hMo5yaam4Jrsm5EPL89UQkoQRyiI+Yf4k8r2ZpdngkV8hr1lIdjb3Q==
 
-debounce-fn@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/debounce-fn/-/debounce-fn-1.0.0.tgz#12064584ee6769daa7d33298f2b07f974ca9f3b8"
-  integrity sha1-EgZFhO5nadqn0zKY8rB/l0yp87g=
-  dependencies:
-    mimic-fn "^1.1.0"
-
 debug@0.7.4:
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/debug/-/debug-0.7.4.tgz#06e1ea8082c2cb14e39806e22e2f6f757f92af39"
@@ -7219,15 +7212,15 @@ init-package-json@^1.10.3:
     validate-npm-package-license "^3.0.1"
     validate-npm-package-name "^3.0.0"
 
-ink@^2.0.0-4:
-  version "2.0.0-4"
-  resolved "https://registry.yarnpkg.com/ink/-/ink-2.0.0-4.tgz#a843d227420c7a835eb1974318f16f344569d665"
-  integrity sha512-p3mygxCow2SiKozrL0GSI7awkv+wLj1C3CXL2As6w80gsJZx2MboTNLkC2v1a1j+N9giN0DGkSMXSKr7pS/dLg==
+ink@^2.0.0-5:
+  version "2.0.0-5"
+  resolved "https://registry.yarnpkg.com/ink/-/ink-2.0.0-5.tgz#a8b9c5b53af791831bece589a6f8612a8f53feef"
+  integrity sha512-7hFyx6WmUEy6WW4OhtyKKRHkx5h1/KvyiwEBDrpjIYOBaHXFU+7BgDkty03FRq5lJzDG6UU+vqDYqsSbilXZPA==
   dependencies:
     arrify "^1.0.1"
     chalk "^2.4.1"
     cli-cursor "^2.1.0"
-    debounce-fn "^1.0.0"
+    lodash.throttle "^4.1.1"
     log-update "^2.3.0"
     prop-types "^15.6.2"
     react "^16.4.2"
@@ -9342,7 +9335,7 @@ mime@^2.3.1:
   resolved "https://registry.yarnpkg.com/mime/-/mime-2.3.1.tgz#b1621c54d63b97c47d3cfe7f7215f7d64517c369"
   integrity sha512-OEUllcVoydBHGN1z84yfQDimn58pZNNNXgZlHXSboxMlFvgI6MXSWpWKpFRra7H1HxpVhHTkrghfRW49k6yjeg==
 
-mimic-fn@^1.0.0, mimic-fn@^1.1.0:
+mimic-fn@^1.0.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-1.2.0.tgz#820c86a39334640e99516928bd03fca88057d022"
   integrity sha512-jf84uxzwiuiIVKiOLpfYk7N46TSy8ubTonmneY9vrpHNAnp0QBt2BxWV9dO3/j+BoVAb+a5G6YDPW3M5HOdMWQ==
