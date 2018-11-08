@@ -144,9 +144,9 @@ async function runTestInternal(
   const originalStdOutWrite = testStdOut.write;
   const originalStdErrWrite = testStdErr.write;
 
-  testStdOut.write = (chunk, ...rest) => {
+  testStdOut.write = (chunk, encoding, ...rest) => {
     const type = 'write';
-    const message = chunk.toString();
+    const message = chunk.toString(encoding);
     const api = 'process.stdout';
 
     if (buffer) {
@@ -162,12 +162,12 @@ async function runTestInternal(
       consoleOut.write(consoleFormatter(type, message, api, 3));
     }
 
-    return originalStdOutWrite.call(testStdOut, chunk, ...rest);
+    return originalStdOutWrite.call(testStdOut, chunk, encoding, ...rest);
   };
 
-  testStdErr.write = (chunk, ...rest) => {
+  testStdErr.write = (chunk, encoding, ...rest) => {
     const type = 'write';
-    const message = chunk.toString();
+    const message = chunk.toString(encoding);
     const api = 'process.stderr';
 
     if (buffer) {
@@ -183,7 +183,7 @@ async function runTestInternal(
       consoleOut.write(consoleFormatter(type, message, api, 3));
     }
 
-    return originalStdErrWrite.call(testStdErr, chunk, ...rest);
+    return originalStdErrWrite.call(testStdErr, chunk, encoding, ...rest);
   };
 
   const environment = new TestEnvironment(config, {console: testConsole});
