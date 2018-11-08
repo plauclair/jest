@@ -185,155 +185,187 @@ export class Summary extends PureComponent<SummaryProps, {runTime: number}> {
     return (
       <Box flexDirection="column">
         <Box>
-          <Box width={13}>
+          <Box flexDirection="column" paddingRight={1}>
             <Text bold>Test Suites:</Text>
-          </Box>
-          {suitesFailed > 0 && (
-            <Fragment>
-              <Color bold red>
-                {suitesFailed} failed
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {suitesPending > 0 && (
-            <Fragment>
-              <Color bold yellow>
-                {suitesPending} skipped
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {suitesPassed > 0 && (
-            <Fragment>
-              <Color bold green>
-                {suitesPassed} passed
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {suitesRun !== suitesTotal && suitesRun + ' of '}
-          {suitesTotal} total
-        </Box>
-        <Box>
-          <Box width={13}>
             <Text bold>Tests:</Text>
-          </Box>
-          {testsFailed > 0 && (
-            <Fragment>
-              <Color bold red>
-                {testsFailed} failed
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {testsPending > 0 && (
-            <Fragment>
-              <Color bold yellow>
-                {testsPending} skipped
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {testsTodo > 0 && (
-            <Fragment>
-              <Color bold magenta>
-                {testsTodo} todo
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {testsPassed > 0 && (
-            <Fragment>
-              <Color bold green>
-                {testsPassed} passed
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {testsTotal} total
-        </Box>
-        <Box>
-          <Box width={13}>
             <Text bold>Snapshots:</Text>
+            <Text bold>Time:</Text>
           </Box>
-          {snapshotsFailed > 0 && (
-            <Fragment>
-              <Color bold red>
-                {snapshotsFailed} failed
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {snapshotsOutdated > 0 &&
-            !snapshotsDidUpdate && (
-              <Fragment>
-                <Color bold yellow>
-                  {snapshotsOutdated} obsolete
-                </Color>
-                ,{' '}
-              </Fragment>
-            )}
-          {snapshotsOutdated > 0 &&
-            snapshotsDidUpdate && (
-              <Fragment>
-                <Color bold green>
-                  {snapshotsOutdated} removed
-                </Color>
-                ,{' '}
-              </Fragment>
-            )}
-          {snapshotsFilesRemoved > 0 &&
-            !snapshotsDidUpdate && (
-              <Fragment>
-                <Color bold yellow>
-                  {pluralize('file', snapshotsFilesRemoved)} obsolete
-                </Color>
-                ,{' '}
-              </Fragment>
-            )}
-          {snapshotsFilesRemoved > 0 &&
-            snapshotsDidUpdate && (
-              <Fragment>
-                <Color bold green>
-                  {pluralize('file', snapshotsFilesRemoved)} removed
-                </Color>
-                ,{' '}
-              </Fragment>
-            )}
-          {snapshotsUpdated > 0 && (
-            <Fragment>
-              <Color bold green>
-                {snapshotsUpdated} updated
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {snapshotsAdded > 0 && (
-            <Fragment>
-              <Color bold green>
-                {snapshotsAdded} written
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {snapshotsPassed > 0 && (
-            <Fragment>
-              <Color bold green>
-                {snapshotsPassed} passed
-              </Color>
-              ,{' '}
-            </Fragment>
-          )}
-          {snapshotsTotal} total
+
+          <Box flexDirection="column">
+            <Box>
+              {suitesFailed > 0 && (
+                <Fragment>
+                  <Color bold red>
+                    {suitesFailed} failed
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {suitesPending > 0 && (
+                <Fragment>
+                  <Color bold yellow>
+                    {suitesPending} skipped
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {suitesPassed > 0 && (
+                <Fragment>
+                  <Color bold green>
+                    {suitesPassed} passed
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {suitesRun !== suitesTotal && suitesRun + ' of '}
+              {suitesTotal} total
+            </Box>
+            <Box>
+              {testsFailed > 0 && (
+                <Fragment>
+                  <Color bold red>
+                    {testsFailed} failed
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {testsPending > 0 && (
+                <Fragment>
+                  <Color bold yellow>
+                    {testsPending} skipped
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {testsTodo > 0 && (
+                <Fragment>
+                  <Color bold magenta>
+                    {testsTodo} todo
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {testsPassed > 0 && (
+                <Fragment>
+                  <Color bold green>
+                    {testsPassed} passed
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {testsTotal} total
+            </Box>
+            <Box>
+              {snapshotsFailed > 0 && (
+                <Fragment>
+                  <Color bold red>
+                    {snapshotsFailed} failed
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {snapshotsOutdated > 0 &&
+                !snapshotsDidUpdate && (
+                  <Fragment>
+                    <Color bold yellow>
+                      {snapshotsOutdated} obsolete
+                    </Color>
+                    ,{' '}
+                  </Fragment>
+                )}
+              {snapshotsOutdated > 0 &&
+                snapshotsDidUpdate && (
+                  <Fragment>
+                    <Color bold green>
+                      {snapshotsOutdated} removed
+                    </Color>
+                    ,{' '}
+                  </Fragment>
+                )}
+              {snapshotsFilesRemoved > 0 &&
+                !snapshotsDidUpdate && (
+                  <Fragment>
+                    <Color bold yellow>
+                      {pluralize('file', snapshotsFilesRemoved)} obsolete
+                    </Color>
+                    ,{' '}
+                  </Fragment>
+                )}
+              {snapshotsFilesRemoved > 0 &&
+                snapshotsDidUpdate && (
+                  <Fragment>
+                    <Color bold green>
+                      {pluralize('file', snapshotsFilesRemoved)} removed
+                    </Color>
+                    ,{' '}
+                  </Fragment>
+                )}
+              {snapshotsUpdated > 0 && (
+                <Fragment>
+                  <Color bold green>
+                    {snapshotsUpdated} updated
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {snapshotsAdded > 0 && (
+                <Fragment>
+                  <Color bold green>
+                    {snapshotsAdded} written
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {snapshotsPassed > 0 && (
+                <Fragment>
+                  <Color bold green>
+                    {snapshotsPassed} passed
+                  </Color>
+                  ,{' '}
+                </Fragment>
+              )}
+              {snapshotsTotal} total
+            </Box>
+            <Time runTime={runTime} estimatedTime={estimatedTime} />
+          </Box>
         </Box>
-        <Time runTime={runTime} estimatedTime={estimatedTime} width={width} />
+        <ProgressBar
+          runTime={runTime}
+          estimatedTime={estimatedTime}
+          width={width}
+        />
       </Box>
     );
   }
 }
 
-const Time = ({runTime, estimatedTime, width}) => {
+const ProgressBar = ({estimatedTime, runTime, width}) => {
+  // Only show a progress bar if the test run is actually going to take
+  // some time.
+  if (estimatedTime <= 2 || runTime >= estimatedTime || !width) {
+    return null;
+  }
+  const availableWidth = Math.min(PROGRESS_BAR_WIDTH, width);
+
+  if (availableWidth < 2) {
+    return null;
+  }
+
+  const length = Math.min(
+    Math.floor((runTime / estimatedTime) * availableWidth),
+    availableWidth,
+  );
+
+  return (
+    <Box>
+      <Color green>{'█'.repeat(length)}</Color>
+      <Color white>{'█'.repeat(availableWidth - length)}</Color>
+    </Box>
+  );
+};
+
+const Time = ({runTime, estimatedTime}) => {
   // If we are more than one second over the estimated time, highlight it.
   const renderedTime =
     estimatedTime && runTime >= estimatedTime + 1 ? (
@@ -344,38 +376,12 @@ const Time = ({runTime, estimatedTime, width}) => {
       <Text>{runTime}s</Text>
     );
 
-  let progressBar;
-
-  // Only show a progress bar if the test run is actually going to take
-  // some time.
-  if (estimatedTime > 2 && runTime < estimatedTime && width) {
-    const availableWidth = Math.min(PROGRESS_BAR_WIDTH, width);
-    const length = Math.min(
-      Math.floor((runTime / estimatedTime) * availableWidth),
-      availableWidth,
-    );
-    if (availableWidth >= 2) {
-      progressBar = (
-        <Box>
-          <Color green>{'█'.repeat(length)}</Color>
-          <Color white>{'█'.repeat(availableWidth - length)}</Color>
-        </Box>
-      );
-    }
-  }
-
   return (
-    <Box flexDirection="column">
-      <Box>
-        <Box width={13}>
-          <Text bold>Time:</Text>
-        </Box>
-        {renderedTime}
-        {runTime < estimatedTime && (
-          <Fragment>, estimated {estimatedTime}s</Fragment>
-        )}
-      </Box>
-      {progressBar}
+    <Box>
+      {renderedTime}
+      {runTime < estimatedTime && (
+        <Fragment>, estimated {estimatedTime}s</Fragment>
+      )}
     </Box>
   );
 };
