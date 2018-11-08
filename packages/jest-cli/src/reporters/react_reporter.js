@@ -14,7 +14,7 @@ import type {ReporterOnStartOptions} from 'types/Reporters';
 import type {ConsoleBuffer, LogType} from 'types/Console';
 
 import React, {Fragment, PureComponent} from 'react';
-import {render, Color, Box, Static} from 'ink';
+import {render, Color, Box, Static, StdoutContext} from 'ink';
 import BaseReporter from './base_reporter';
 import {FormattedPath, Summary} from './utils';
 import SnapshotStatus from './get_snapshot_status';
@@ -236,35 +236,43 @@ class Reporter extends PureComponent<
     const {globalConfig, options} = this.props;
     const {estimatedTime = 0} = options;
 
-    // $FlowFixMe
-    const width: number = process.stdout.columns;
-
     return (
       <Box flexDirection="column">
-        <CompletedTests
-          completedTests={completedTests}
-          width={width}
-          globalConfig={globalConfig}
-        />
-        {currentTests.length > 0 && (
-          <Box paddingBottom={1} flexDirection="column">
-            {currentTests.map(([path, config]) => (
-              <Box key={path}>
-                <Runs />{' '}
-                <FormattedPath
-                  pad={8}
-                  columns={width}
-                  config={config || globalConfig}
-                  testPath={path}
+        <StdoutContext>
+          {({stdout}: {stdout: typeof process.stdout}) => {
+            // $FlowFixMe
+            const width: number = stdout.columns;
+
+            return (
+              <Fragment>
+                <CompletedTests
+                  completedTests={completedTests}
+                  width={width}
+                  globalConfig={globalConfig}
                 />
-              </Box>
-            ))}
-          </Box>
-        )}
-        <Summary
-          aggregatedResults={aggregatedResults}
-          options={{estimatedTime, roundTime: true, width}}
-        />
+                {currentTests.length > 0 && (
+                  <Box paddingBottom={1} flexDirection="column">
+                    {currentTests.map(([path, config]) => (
+                      <Box key={path}>
+                        <Runs />{' '}
+                        <FormattedPath
+                          pad={8}
+                          columns={width}
+                          config={config || globalConfig}
+                          testPath={path}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+                <Summary
+                  aggregatedResults={aggregatedResults}
+                  options={{estimatedTime, roundTime: true, width}}
+                />
+              </Fragment>
+            );
+          }}
+        </StdoutContext>
       </Box>
     );
   }
