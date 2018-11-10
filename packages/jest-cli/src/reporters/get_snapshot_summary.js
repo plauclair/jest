@@ -10,124 +10,117 @@
 import type {SnapshotSummary} from 'types/TestResult';
 import type {GlobalConfig} from 'types/Config';
 
-import chalk from 'chalk';
+import React, {Fragment} from 'react';
+import {Color, Box, Text} from 'ink';
 import {formatTestPath, pluralize} from './utils';
 
 const ARROW = ' \u203A ';
 const DOWN_ARROW = ' \u21B3 ';
 const DOT = ' \u2022 ';
-const FAIL_COLOR = chalk.bold.red;
-const OBSOLETE_COLOR = chalk.bold.yellow;
-const SNAPSHOT_ADDED = chalk.bold.green;
-const SNAPSHOT_NOTE = chalk.dim;
-const SNAPSHOT_REMOVED = chalk.bold.green;
-const SNAPSHOT_SUMMARY = chalk.bold;
-const SNAPSHOT_UPDATED = chalk.bold.green;
 
-export default (
+export default ({
+  snapshots,
+  globalConfig,
+  updateCommand,
+}: {
   snapshots: SnapshotSummary,
   globalConfig: GlobalConfig,
   updateCommand: string,
-): Array<string> => {
-  const summary = [];
-  summary.push(SNAPSHOT_SUMMARY('Snapshot Summary'));
-  if (snapshots.added) {
-    summary.push(
-      SNAPSHOT_ADDED(
-        ARROW + pluralize('snapshot', snapshots.added) + ' written ',
-      ) + `from ${pluralize('test suite', snapshots.filesAdded)}.`,
-    );
-  }
-
-  if (snapshots.unmatched) {
-    summary.push(
-      FAIL_COLOR(
-        `${ARROW}${pluralize('snapshot', snapshots.unmatched)} failed`,
-      ) +
-        ` from ${pluralize('test suite', snapshots.filesUnmatched)}. ` +
-        SNAPSHOT_NOTE(
-          'Inspect your code changes or ' + updateCommand + ' to update them.',
-        ),
-    );
-  }
-
-  if (snapshots.updated) {
-    summary.push(
-      SNAPSHOT_UPDATED(
-        ARROW + pluralize('snapshot', snapshots.updated) + ' updated ',
-      ) + `from ${pluralize('test suite', snapshots.filesUpdated)}.`,
-    );
-  }
-
-  if (snapshots.filesRemoved) {
-    if (snapshots.didUpdate) {
-      summary.push(
-        SNAPSHOT_REMOVED(
-          `${ARROW}${pluralize(
-            'snapshot file',
-            snapshots.filesRemoved,
-          )} removed `,
-        ) + `from ${pluralize('test suite', snapshots.filesRemoved)}.`,
-      );
-    } else {
-      summary.push(
-        OBSOLETE_COLOR(
-          `${ARROW}${pluralize(
-            'snapshot file',
-            snapshots.filesRemoved,
-          )} obsolete `,
-        ) +
-          `from ${pluralize('test suite', snapshots.filesRemoved)}. ` +
-          SNAPSHOT_NOTE(
-            `To remove ${
-              snapshots.filesRemoved === 1 ? 'it' : 'them all'
-            }, ${updateCommand}.`,
-          ),
-      );
-    }
-  }
-
-  if (snapshots.unchecked) {
-    if (snapshots.didUpdate) {
-      summary.push(
-        SNAPSHOT_REMOVED(
-          `${ARROW}${pluralize('snapshot', snapshots.unchecked)} removed `,
-        ) +
-          `from ${pluralize(
-            'test suite',
-            snapshots.uncheckedKeysByFile.length,
-          )}.`,
-      );
-    } else {
-      summary.push(
-        OBSOLETE_COLOR(
-          `${ARROW}${pluralize('snapshot', snapshots.unchecked)} obsolete `,
-        ) +
-          `from ${pluralize(
-            'test suite',
-            snapshots.uncheckedKeysByFile.length,
-          )}. ` +
-          SNAPSHOT_NOTE(
-            `To remove ${
-              snapshots.unchecked === 1 ? 'it' : 'them all'
-            }, ${updateCommand}.`,
-          ),
-      );
-    }
-
-    snapshots.uncheckedKeysByFile.forEach(uncheckedFile => {
-      summary.push(
-        `  ${DOWN_ARROW}${formatTestPath(
-          globalConfig,
-          uncheckedFile.filePath,
-        )}`,
-      );
-
-      uncheckedFile.keys.forEach(key => {
-        summary.push(`      ${DOT}${key}`);
-      });
-    });
-  }
-
-  return summary;
-};
+}) => (
+  <Box flexDirection="column">
+    <Text bold>Snapshot Summary</Text>
+    {snapshots.added && (
+      <Box>
+        <Color bold green>
+          {ARROW}
+          {pluralize('snapshot', snapshots.added)} written
+        </Color>{' '}
+        from {pluralize('test suite', snapshots.filesAdded)}.
+      </Box>
+    )}
+    {snapshots.unmatched && (
+      <Box>
+        <Color bold red>
+          {ARROW}
+          {pluralize('snapshot', snapshots.unmatched)} failed
+        </Color>{' '}
+        from {pluralize('test suite', snapshots.filesUnmatched)}.{' '}
+        <Color dim>
+          Inspect your code changes or {updateCommand} to update them.
+        </Color>
+      </Box>
+    )}
+    {snapshots.updated && (
+      <Box>
+        <Color bold green>
+          {ARROW}
+          {pluralize('snapshot', snapshots.updated)} updated
+        </Color>{' '}
+        from {pluralize('test suite', snapshots.filesUpdated)}.
+      </Box>
+    )}
+    {snapshots.filesRemoved &&
+      (snapshots.didUpdate ? (
+        <Box>
+          <Color bold green>
+            {ARROW}
+            {pluralize('snapshot file', snapshots.filesRemoved)} removed
+          </Color>{' '}
+          from {pluralize('test suite', snapshots.filesRemoved)}.
+        </Box>
+      ) : (
+        <Box>
+          <Color bold yellow>
+            {ARROW}
+            {pluralize('snapshot file', snapshots.filesRemoved)} obsolete
+          </Color>{' '}
+          from {pluralize('test suite', snapshots.filesRemoved)}.{' '}
+          <Color dim>
+            To remove ${snapshots.filesRemoved === 1 ? 'it' : 'them all'},{' '}
+            {updateCommand}.
+          </Color>
+        </Box>
+      ))}
+    {snapshots.unchecked &&
+      (snapshots.didUpdate ? (
+        <Box>
+          <Color bold green>
+            {ARROW}
+            {pluralize('snapshot', snapshots.unchecked)} removed
+          </Color>{' '}
+          from {pluralize('test suite', snapshots.uncheckedKeysByFile.length)}.
+        </Box>
+      ) : (
+        <Box>
+          <Color bold yellow>
+            {ARROW}
+            {pluralize('snapshot', snapshots.unchecked)} obsolete
+          </Color>{' '}
+          from {pluralize('test suite', snapshots.uncheckedKeysByFile.length)}.{' '}
+          <Color dim>
+            To remove ${snapshots.unchecked === 1 ? 'it' : 'them all'},{' '}
+            {updateCommand}.
+          </Color>
+        </Box>
+      ))}
+    {snapshots.unchecked &&
+      snapshots.uncheckedKeysByFile.map(uncheckedFile => (
+        <Fragment>
+          <Box>
+            &nbsp;&nbsp;
+            {DOWN_ARROW}
+            {formatTestPath(globalConfig, uncheckedFile.filePath)}
+          </Box>
+          <Box>
+            {uncheckedFile.keys.map(key => (
+              <Fragment>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {DOT}
+                {key}
+              </Fragment>
+            ))}
+          </Box>
+        </Fragment>
+      ))}
+  </Box>
+);

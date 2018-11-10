@@ -122,10 +122,12 @@ const CompletedTests = ({
   completedTests,
   width,
   globalConfig,
+  done,
 }: {
   completedTests: Array<{testResult: TestResult, config: ProjectConfig}>,
   width: number,
   globalConfig: GlobalConfig,
+  done: boolean,
 }) => {
   if (completedTests.length === 0) {
     return null;
@@ -133,7 +135,7 @@ const CompletedTests = ({
   const didUpdate = globalConfig.updateSnapshot === 'all';
 
   return (
-    <Box paddingBottom={1} flexDirection="column">
+    <Box paddingBottom={done ? 0 : 1} flexDirection="column">
       <Static>
         {completedTests.map(({testResult, config}) => (
           <Fragment key={testResult.testFilePath}>
@@ -174,7 +176,8 @@ type DateEvents =
         test: Test,
         testResult: TestResult,
       |},
-    |};
+    |}
+  | {|type: 'TestComplete'|};
 
 class Reporter extends PureComponent<
   {
@@ -187,6 +190,7 @@ class Reporter extends PureComponent<
     aggregatedResults: AggregatedResult,
     completedTests: Array<{testResult: TestResult, config: ProjectConfig}>,
     currentTests: Array<[Path, ProjectConfig]>,
+    done: boolean,
   },
 > {
   constructor(props) {
@@ -198,6 +202,7 @@ class Reporter extends PureComponent<
       aggregatedResults: props.aggregatedResults,
       completedTests: [],
       currentTests: [],
+      done: false,
     };
   }
 
@@ -228,17 +233,21 @@ class Reporter extends PureComponent<
         });
         break;
       }
+      case 'TestComplete': {
+        this.setState({done: true});
+        break;
+      }
     }
   }
 
   render() {
-    const {currentTests, completedTests, aggregatedResults} = this.state;
+    const {currentTests, completedTests, aggregatedResults, done} = this.state;
     const {globalConfig, options} = this.props;
     const {estimatedTime = 0} = options;
 
     return (
       <Box flexDirection="column">
-        <StdoutContext>
+        <StdoutContext.Consumer>
           {({stdout}: {stdout: typeof process.stdout}) => {
             // $FlowFixMe
             const width: number = stdout.columns;
@@ -249,6 +258,7 @@ class Reporter extends PureComponent<
                   completedTests={completedTests}
                   width={width}
                   globalConfig={globalConfig}
+                  done={done}
                 />
                 {currentTests.length > 0 && (
                   <Box paddingBottom={1} flexDirection="column">
@@ -265,14 +275,16 @@ class Reporter extends PureComponent<
                     ))}
                   </Box>
                 )}
-                <Summary
-                  aggregatedResults={aggregatedResults}
-                  options={{estimatedTime, roundTime: true, width}}
-                />
+                {!done && (
+                  <Summary
+                    aggregatedResults={aggregatedResults}
+                    options={{estimatedTime, roundTime: true, width}}
+                  />
+                )}
               </Fragment>
             );
           }}
-        </StdoutContext>
+        </StdoutContext.Consumer>
       </Box>
     );
   }
@@ -293,7 +305,6 @@ export default class DefaultReporter extends BaseReporter {
     aggregatedResults: AggregatedResult,
     options: ReporterOnStartOptions,
   ) {
-    super.onRunStart(aggregatedResults, options);
     this._unmount = render(
       <Reporter
         register={cb => this._components.push(cb)}
@@ -319,6 +330,7 @@ export default class DefaultReporter extends BaseReporter {
   }
 
   onRunComplete() {
+    this._components.forEach(cb => cb({type: 'TestComplete'}));
     this._unmount();
   }
 }

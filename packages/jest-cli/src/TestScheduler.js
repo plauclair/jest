@@ -301,6 +301,8 @@ export default class TestScheduler {
     if (collectCoverage) {
       this.addReporter(new CoverageReporter(this._globalConfig));
     }
+
+    this.addReporter(new SummaryReporter(this._globalConfig));
   }
 
   _addCustomReporters(reporters: Array<string | ReporterConfig>) {
