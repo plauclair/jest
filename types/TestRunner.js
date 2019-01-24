@@ -17,7 +17,7 @@ import type {
   TestResult,
 } from 'types/TestResult';
 import type Runtime from 'jest-runtime';
-import type {TestWatcher as _TestWatcher} from 'jest-cli';
+import type {TestWatcher as _TestWatcher} from 'jest-core';
 
 export type Test = {|
   context: Context,
