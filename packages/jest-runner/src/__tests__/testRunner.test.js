@@ -9,7 +9,7 @@
 'use strict';
 
 const TestRunner = require('../index');
-const {TestWatcher} = require('jest-cli');
+const {TestWatcher} = require('jest-core');
 
 let mockWorkerFarm;
 
