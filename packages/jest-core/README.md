@@ -1,11 +1,3 @@
-# Jest
+# jest-core
 
-🃏 Delightful JavaScript Testing
-
-- **👩🏻‍💻 Developer Ready**: Complete and ready to set-up JavaScript testing solution. Works out of the box for any React project.
-
-- **🏃🏽 Instant Feedback**: Failed tests run first. Fast interactive mode can switch between running all tests or only test files related to changed files.
-
-- **📸 Snapshot Testing**: Jest can [capture snapshots](https://jestjs.io/docs/snapshot-testing.html) of React trees or other serializable values to simplify UI testing.
-
-Read More: https://jestjs.io/
+Jest is currently working on providing a programmatic API. This is under developemnt, and usage of this package directly is currently not supported.
