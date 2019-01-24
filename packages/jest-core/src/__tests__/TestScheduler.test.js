@@ -84,7 +84,7 @@ test('.addReporter() .removeReporter()', () => {
   expect(scheduler._dispatcher._reporters).not.toContain(reporter);
 });
 
-test.only('schedule tests run in parallel per default', async () => {
+test('schedule tests run in parallel per default', async () => {
   const scheduler = new TestScheduler({}, {});
   const test = {
     context: {
