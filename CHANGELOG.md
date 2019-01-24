@@ -132,7 +132,7 @@
 - `[jest-util]` [**BREAKING**] Remove long-deprecated globals for fake timers ([#7285](https://github.com/facebook/jest/pull/7285))
 - `[*]` [**BREAKING**] Upgrade to Micromatch 3 ([#6650](https://github.com/facebook/jest/pull/6650))
 - `[*]` [**BREAKING**] Remove regenerator-runtime injection ([#7595](https://github.com/facebook/jest/pull/7595))
-- `[jest-cli]` [**BREAKING**] Move everything not related to CLI args parsing into a new `jest-core` package
+- `[jest-cli]` [**BREAKING**] Move everything not related to CLI args parsing into a new `jest-core` package ([#7696](https://github.com/facebook/jest/pull/7696))
 - `[jest-worker]` Disable `worker_threads` to avoid issues with libraries to ready for it ([#7681](https://github.com/facebook/jest/pull/7681))
 - `[docs]` Fix message property in custom matcher example to return a function instead of a constant. ([#7426](https://github.com/facebook/jest/pull/7426))
 - `[jest-circus]` Standardize file naming in `jest-circus` ([#7301](https://github.com/facebook/jest/pull/7301))
@@ -172,7 +172,7 @@
 - `[diff-sequences]` Add performance benchmark to package ([#7603](https://github.com/facebook/jest/pull/7603))
 - `[*]` Replace as many `Object.assign` with object spread as possible ([#7627](https://github.com/facebook/jest/pull/7627))
 - `[ci]` Initial support for Azure Pipelines ([#7556](https://github.com/facebook/jest/pull/7556))
-- `[jest-core]` Create new package, which is `jest-cli` minus `yargs
+- `[jest-core]` Create new package, which is `jest-cli` minus `yargs` ([#7696](https://github.com/facebook/jest/pull/7696))
 
 ### Performance
 
