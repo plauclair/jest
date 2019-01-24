@@ -7,17 +7,7 @@
  * @flow
  */
 
-import {version as VERSION} from '../package.json';
-
-import SearchSource from './SearchSource';
-import TestScheduler from './TestScheduler';
-import TestWatcher from './TestWatcher';
-import {runCLI} from './cli';
-
-module.exports = {
-  SearchSource,
-  TestScheduler,
-  TestWatcher,
-  getVersion: () => VERSION,
-  runCLI,
-};
+export {default as SearchSource} from './SearchSource';
+export {default as TestScheduler} from './TestScheduler';
+export {default as TestWatcher} from './TestWatcher';
+export {runCLI} from './cli';
