@@ -105,7 +105,7 @@ test('schedule tests run in parallel per default', async () => {
   expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeFalsy();
 });
 
-test.skip('schedule tests run in serial if the runner flags them', async () => {
+test('schedule tests run in serial if the runner flags them', async () => {
   const scheduler = new TestScheduler({}, {});
   const test = {
     context: {
@@ -126,7 +126,7 @@ test.skip('schedule tests run in serial if the runner flags them', async () => {
   expect(mockSerialRunner.runTests.mock.calls[0][5].serial).toBeTruthy();
 });
 
-test.skip('should bail after `n` failures', async () => {
+test('should bail after `n` failures', async () => {
   const scheduler = new TestScheduler({bail: 2}, {});
   const test = {
     context: {
@@ -156,7 +156,7 @@ test.skip('should bail after `n` failures', async () => {
   expect(setState).toBeCalledWith({interrupted: true});
 });
 
-test.skip('should not bail if less than `n` failures', async () => {
+test('should not bail if less than `n` failures', async () => {
   const scheduler = new TestScheduler({bail: 2}, {});
   const test = {
     context: {
@@ -186,7 +186,7 @@ test.skip('should not bail if less than `n` failures', async () => {
   expect(setState).not.toBeCalled();
 });
 
-test.skip('should set runInBand to run in serial', async () => {
+test('should set runInBand to run in serial', async () => {
   const scheduler = new TestScheduler({}, {});
   const test = {
     context: {
@@ -210,7 +210,7 @@ test.skip('should set runInBand to run in serial', async () => {
   expect(mockParallelRunner.runTests.mock.calls[0][5].serial).toBeTruthy();
 });
 
-test.skip('should set runInBand to not run in serial', async () => {
+test('should set runInBand to not run in serial', async () => {
   const scheduler = new TestScheduler({}, {});
   const test = {
     context: {
