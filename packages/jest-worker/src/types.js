@@ -70,7 +70,6 @@ export type FarmOptions = {
     workerPath: string,
     options?: WorkerPoolOptions,
   ) => WorkerPoolInterface,
-  enableWorkerThreads?: boolean,
 };
 
 export type WorkerPoolOptions = {|
@@ -78,7 +77,6 @@ export type WorkerPoolOptions = {|
   forkOptions: ForkOptions,
   maxRetries: number,
   numWorkers: number,
-  enableWorkerThreads: boolean,
 |};
 
 export type WorkerOptions = {|
