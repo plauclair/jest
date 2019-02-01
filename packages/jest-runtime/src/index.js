@@ -946,7 +946,9 @@ class Runtime {
       return jestObject;
     };
     const _getFakeTimers = () => {
-      if (!this._environment.fakeTimers) {
+      if (
+        !(this._environment.fakeTimers || this._environment.fakeTimersLolex)
+      ) {
         this._logFormattedReferenceError(
           'You are trying to access a property or method of the Jest environment after it has been torn down.',
         );
