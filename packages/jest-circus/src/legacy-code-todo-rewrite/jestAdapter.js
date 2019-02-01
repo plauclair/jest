@@ -51,6 +51,10 @@ const jestAdapter = async (
     environment.fakeTimers.useFakeTimers();
   }
 
+  if (config.timers === 'lolex') {
+    environment.fakeTimersLolex.useFakeTimers();
+  }
+
   globals.beforeEach(() => {
     if (config.resetModules) {
       runtime.resetModules();

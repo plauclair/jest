@@ -91,6 +91,10 @@ async function jasmine2(
     environment.fakeTimers.useFakeTimers();
   }
 
+  if (config.timers === 'lolex') {
+    environment.fakeTimersLolex.useFakeTimers();
+  }
+
   env.beforeEach(() => {
     if (config.resetModules) {
       runtime.resetModules();

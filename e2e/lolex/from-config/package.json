@@ -1,0 +1,6 @@
+{
+  "jest": {
+    "timers": "lolex",
+    "testEnvironment": "node"
+  }
+}

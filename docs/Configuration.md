@@ -1002,6 +1002,8 @@ Default: `real`
 
 Setting this value to `fake` allows the use of fake timers for functions such as `setTimeout`. Fake timers are useful when a piece of code sets a long timeout that we don't want to wait for in a test.
 
+If the value is `lolex`, Lolex will be used as implementation instead of Jest's own. This will be the default fake implementation in a future major version of Jest.
+
 ### `transform` [object<string, string>]
 
 Default: `undefined`

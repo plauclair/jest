@@ -11,6 +11,7 @@ import type {ProjectConfig} from './Config';
 import type {Global} from './Global';
 import type {Script} from 'vm';
 import type {ModuleMocker} from 'jest-mock';
+import {FakeTimers, FakeTimersLolex} from 'jest-util';
 
 export type EnvironmentContext = {
   console?: Object,
@@ -21,18 +22,8 @@ declare class $JestEnvironment {
   constructor(config: ProjectConfig, context?: EnvironmentContext): void;
   runScript(script: Script): any;
   global: Global;
-  fakeTimers: {
-    clearAllTimers(): void,
-    runAllImmediates(): void,
-    runAllTicks(): void,
-    runAllTimers(): void,
-    advanceTimersByTime(msToRun: number): void,
-    runOnlyPendingTimers(): void,
-    runWithRealTimers(callback: any): void,
-    getTimerCount(): number,
-    useFakeTimers(): void,
-    useRealTimers(): void,
-  };
+  fakeTimers: FakeTimers<*>;
+  fakeTimersLolex: FakeTimersLolex;
   testFilePath: string;
   moduleMocker: ModuleMocker;
   setup(): Promise<void>;

@@ -408,9 +408,11 @@ Restores all mocks back to their original value. Equivalent to calling [`.mockRe
 
 ## Mock timers
 
-### `jest.useFakeTimers()`
+### `jest.useFakeTimers(string?)`
 
 Instructs Jest to use fake versions of the standard timer functions (`setTimeout`, `setInterval`, `clearTimeout`, `clearInterval`, `nextTick`, `setImmediate` and `clearImmediate`).
+
+If you pass `'lolex'` as argument, Lolex will be used as implementation instead of Jest's own fake timers.
 
 Returns the `jest` object for chaining.
 
@@ -438,6 +440,8 @@ This is often useful for synchronously executing setTimeouts during a test in or
 
 Exhausts all tasks queued by `setImmediate()`.
 
+> Note: This function is not available when using Lolex as fake timers implementation
+
 ### `jest.advanceTimersByTime(msToRun)`
 
 ##### renamed in Jest **22.0.0+**
@@ -463,6 +467,18 @@ This means, if any timers have been scheduled (but have not yet executed), they 
 ### `jest.getTimerCount()`
 
 Returns the number of fake timers still left to run.
+
+### `.jest.setSystemTime()`
+
+Set the current system time used by fake timers. Simulates a user changing the system clock while your program is running. It affects the current time but it does not in itself cause e.g. timers to fire; they will fire exactly as they would have done without the call to `jest.setSystemTime()`.
+
+> Note: This function is only available when using Lolex as fake timers implementation
+
+### `.jest.getRealSystemTime()`
+
+When mocking time, `Date.now()` will also be mocked. If you for some reason need access to the real current time, you can invoke this function.
+
+> Note: This function is only available when using Lolex as fake timers implementation
 
 ## Misc
 

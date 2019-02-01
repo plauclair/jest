@@ -296,7 +296,7 @@ export type ProjectConfig = {|
   testRegex: Array<string>,
   testRunner: string,
   testURL: string,
-  timers: 'real' | 'fake',
+  timers: 'real' | 'fake' | 'lolex',
   transform: Array<[string, Path]>,
   transformIgnorePatterns: Array<Glob>,
   watchPathIgnorePatterns: Array<string>,

@@ -13,6 +13,7 @@ import CustomConsole from './CustomConsole';
 import createDirectory from './createDirectory';
 import ErrorWithStack from './ErrorWithStack';
 import FakeTimers from './FakeTimers';
+import FakeTimersLolex from './FakeTimersLolex';
 import formatTestResults from './formatTestResults';
 import getFailedSnapshotTests from './getFailedSnapshotTests';
 import getConsoleOutput from './getConsoleOutput';
@@ -31,6 +32,7 @@ module.exports = {
   Console: CustomConsole,
   ErrorWithStack,
   FakeTimers,
+  FakeTimersLolex,
   NullConsole,
   clearLine,
   convertDescriptorToString,

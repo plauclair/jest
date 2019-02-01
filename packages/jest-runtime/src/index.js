@@ -21,7 +21,12 @@ import path from 'path';
 import HasteMap from 'jest-haste-map';
 import {formatStackTrace, separateMessageFromStack} from 'jest-message-util';
 import Resolver from 'jest-resolve';
-import {createDirectory, deepCyclicCopy} from 'jest-util';
+import {
+  FakeTimers,
+  FakeTimersLolex,
+  createDirectory,
+  deepCyclicCopy,
+} from 'jest-util';
 import {escapePathForRegex} from 'jest-regex-util';
 import Snapshot from 'jest-snapshot';
 import fs from 'graceful-fs';
@@ -92,6 +97,7 @@ class Runtime {
   _currentlyExecutingModulePath: string;
   _environment: Environment;
   _explicitShouldMock: BooleanObject;
+  _fakeTimersImplementation: FakeTimers<*> | FakeTimersLolex;
   _internalModuleRegistry: ModuleRegistry;
   _isCurrentlyExecutingManualMock: ?string;
   _mockFactories: {[key: string]: () => any, __proto__: null};
@@ -147,6 +153,11 @@ class Runtime {
     this._shouldMockModuleCache = Object.create(null);
     this._shouldUnmockTransitiveDependenciesCache = Object.create(null);
     this._transitiveShouldMock = Object.create(null);
+
+    this._fakeTimersImplementation =
+      config.timers === 'lolex'
+        ? this._environment.fakeTimersLolex
+        : this._environment.fakeTimers;
 
     this._unmockList = unmockRegExpCache.get(config);
     if (!this._unmockList && config.unmockedModulePathPatterns) {
@@ -934,12 +945,28 @@ class Runtime {
       this.restoreAllMocks();
       return jestObject;
     };
-    const useFakeTimers = () => {
-      this._environment.fakeTimers.useFakeTimers();
+    const _getFakeTimers = () => {
+      if (!this._environment.fakeTimers) {
+        this._logFormattedReferenceError(
+          'You are trying to access a property or method of the Jest environment after it has been torn down.',
+        );
+        process.exitCode = 1;
+      }
+
+      return this._fakeTimersImplementation;
+    };
+    const useFakeTimers = (type: string = 'default') => {
+      if (type === 'lolex') {
+        this._fakeTimersImplementation = this._environment.fakeTimersLolex;
+      } else {
+        this._fakeTimersImplementation = this._environment.fakeTimers;
+      }
+      this._fakeTimersImplementation.useFakeTimers();
       return jestObject;
     };
     const useRealTimers = () => {
-      this._environment.fakeTimers.useRealTimers();
+      // $FlowFixMe
+      _getFakeTimers().useRealTimers();
       return jestObject;
     };
     const resetModules = () => {
@@ -967,17 +994,6 @@ class Runtime {
       return jestObject;
     };
 
-    const _getFakeTimers = () => {
-      if (!this._environment.fakeTimers) {
-        this._logFormattedReferenceError(
-          'You are trying to access a property or method of the Jest environment after it has been torn down.',
-        );
-        process.exitCode = 1;
-      }
-
-      return this._environment.fakeTimers;
-    };
-
     const jestObject = {
       addMatchers: (matchers: Object) =>
         this._environment.global.jasmine.addMatchers(matchers),
@@ -995,6 +1011,17 @@ class Runtime {
       fn,
       genMockFromModule: (moduleName: string) =>
         this._generateMock(from, moduleName),
+      getRealSystemTime: () => {
+        const fakeTimers = _getFakeTimers();
+
+        if (fakeTimers instanceof FakeTimersLolex) {
+          return fakeTimers.getRealSystemTime();
+        } else {
+          throw new TypeError(
+            'getRealSystemTime is not available when not using Lolex',
+          );
+        }
+      },
       getTimerCount: () => _getFakeTimers().getTimerCount(),
       isMockFunction: this._moduleMocker.isMockFunction,
       isolateModules,
@@ -1006,7 +1033,17 @@ class Runtime {
       resetModules,
       restoreAllMocks,
       retryTimes,
-      runAllImmediates: () => _getFakeTimers().runAllImmediates(),
+      runAllImmediates: () => {
+        const fakeTimers = _getFakeTimers();
+
+        if (fakeTimers instanceof FakeTimers) {
+          fakeTimers.runAllImmediates();
+        } else {
+          throw new TypeError(
+            'runAllImmediates is not available when using Lolex',
+          );
+        }
+      },
       runAllTicks: () => _getFakeTimers().runAllTicks(),
       runAllTimers: () => _getFakeTimers().runAllTimers(),
       runOnlyPendingTimers: () => _getFakeTimers().runOnlyPendingTimers(),
@@ -1014,6 +1051,17 @@ class Runtime {
         _getFakeTimers().advanceTimersByTime(msToRun),
       setMock: (moduleName: string, mock: Object) =>
         setMockFactory(moduleName, () => mock),
+      setSystemTime: (now?: number) => {
+        const fakeTimers = _getFakeTimers();
+
+        if (fakeTimers instanceof FakeTimersLolex) {
+          fakeTimers.setSystemTime(now);
+        } else {
+          throw new TypeError(
+            'setSystemTime is not available when not using Lolex',
+          );
+        }
+      },
       setTimeout,
       spyOn,
       unmock,

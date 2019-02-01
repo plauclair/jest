@@ -12,13 +12,14 @@ import type {EnvironmentContext} from 'types/Environment';
 import type {Global} from 'types/Global';
 import type {ModuleMocker} from 'jest-mock';
 
-import {FakeTimers, installCommonGlobals} from 'jest-util';
+import {FakeTimers, FakeTimersLolex, installCommonGlobals} from 'jest-util';
 import mock from 'jest-mock';
 import {JSDOM, VirtualConsole} from 'jsdom';
 
 class JSDOMEnvironment {
   dom: ?Object;
   fakeTimers: ?FakeTimers<number>;
+  fakeTimersLolex: ?FakeTimersLolex;
   global: ?Global;
   errorEventListener: ?Function;
   moduleMocker: ?ModuleMocker;
@@ -76,6 +77,11 @@ class JSDOMEnvironment {
       moduleMocker: this.moduleMocker,
       timerConfig,
     });
+
+    this.fakeTimersLolex = new FakeTimersLolex({
+      config,
+      global,
+    });
   }
 
   setup(): Promise<void> {
@@ -85,6 +91,9 @@ class JSDOMEnvironment {
   teardown(): Promise<void> {
     if (this.fakeTimers) {
       this.fakeTimers.dispose();
+    }
+    if (this.fakeTimersLolex) {
+      this.fakeTimersLolex.dispose();
     }
     if (this.global) {
       if (this.errorEventListener) {
@@ -98,6 +107,7 @@ class JSDOMEnvironment {
     this.global = null;
     this.dom = null;
     this.fakeTimers = null;
+    this.fakeTimersLolex = null;
     return Promise.resolve();
   }
 
