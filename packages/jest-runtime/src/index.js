@@ -967,7 +967,6 @@ class Runtime {
       return jestObject;
     };
     const useRealTimers = () => {
-      // $FlowFixMe
       _getFakeTimers().useRealTimers();
       return jestObject;
     };
